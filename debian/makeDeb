@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if [ -z "$1" ]
+then
+  echo "Usage: $0 «Architecture»"
+  echo "Architecture: amd64, armv7, or armhf"
+  exit 1
+fi
+
+# setup
+pwd=`pwd`
+cd `dirname $0`
+arch=$1
+version=`grep Version control-$arch | cut -d " " -f 2`
+package=tcl-metakit_${version}_$arch
+mk4dir=Mk4tcl$version
+
+if [ ! -e "control-$arch" ] 
+then
+  echo "Architecture not suported."
+  exit 1
+fi
+
+baseimage=$arch/debian
+if [ "$arch" == "armv7" ]
+then
+  baseimage=arm32v7/debian
+fi
+
+# Build .deb
+docker build -f ./Dockerfile --build-arg arch=$arch --build-arg mk4dir=$mk4dir --build-arg baseimage=$baseimage -t metakit ..
+
+# Extract .deb
+id=$(docker create metakit)
+docker cp $id:/tmp/$package.deb $package.deb
+touch $package.deb
+docker rm $id
