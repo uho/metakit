@@ -3,7 +3,7 @@
 if [ -z "$1" ]
 then
   echo "Usage: $0 «Architecture»"
-  echo "Architecture: amd64, armv7, or armhf"
+  echo "Architecture: amd64, armv7, armhf, or arm64"
   exit 1
 fi
 
@@ -25,6 +25,10 @@ baseimage=$arch/debian
 if [ "$arch" == "armv7" ]
 then
   baseimage=arm32v7/debian
+fi
+if [ "$arch" == "arm64" ]
+then
+  baseimage=arm64v8/debian
 fi
 
 # Build .deb
